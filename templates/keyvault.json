@@ -5,8 +5,9 @@
         "keyVaultName": {
             "type": "string"
         },
-        "servicePrincipalObjectId": {
-            "type": "string"
+        "keyVaultAccessPolicies": {
+            "type": "array",
+            "defaultValue": []
         }
     },
     "variables": {},
@@ -17,19 +18,7 @@
             "apiVersion": "2015-06-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "accessPolicies": [
-                    {
-                        "objectId": "[parameters('servicePrincipalObjectId')]",
-                        "tenantId": "[subscription().tenantId]",
-                        "permissions": {
-                            "secrets": [
-                                "Get",
-                                "List",
-                                "Set"
-                            ]
-                        }
-                    }
-                ],
+                "accessPolicies": "[parameters('keyVaultAccessPolicies')]",
                 "tenantId": "[subscription().tenantId]",
                 "sku": {
                     "name": "Standard",
