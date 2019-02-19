@@ -68,5 +68,10 @@
             ]
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "possibleOutboundIpAddresses": {
+            "type": "array",
+            "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
+        }
+    }
 }
