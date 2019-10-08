@@ -20,7 +20,7 @@
             "defaultValue": []
         },
         "customHostName": {
-            "type": "array",
+            "type": "string",
             "defaultValue": ""
         },
         "certificateThumbprint": {
@@ -87,7 +87,7 @@
         {
             "type": "Microsoft.Web/sites/hostnameBindings",
             "condition": "[variables('UseCustomHostname')]",
-            "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname')[copyIndex()], 'placeholder'))]",
+            "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
             "apiVersion": "2016-08-01",
             "location": "[resourceGroup().location]",
             "properties": {
