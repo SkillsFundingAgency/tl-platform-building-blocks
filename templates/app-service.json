@@ -20,7 +20,7 @@
             "defaultValue": []
         },
         "customHostName": {
-            "type": "string",
+            "type": "array",
             "defaultValue": ""
         },
         "certificateThumbprint": {
@@ -33,6 +33,14 @@
         "deployStagingSlot": {
             "type": "bool",
             "defaultValue": true
+        },
+        "sslBindingType": {
+            "type": "string",
+            "defaultValue": "SniEnabled",
+            "allowedValues" : [
+                "SniEnabled",
+                "IpBasedEnabled"
+            ]
         }
     },
     "variables": {
@@ -79,16 +87,20 @@
         {
             "type": "Microsoft.Web/sites/hostnameBindings",
             "condition": "[variables('UseCustomHostname')]",
-            "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
+            "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname')[copyIndex()], 'placeholder'))]",
             "apiVersion": "2016-08-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "sslState": "SniEnabled",
+                "sslState": "[parameters('sslBindingType')]",
                 "thumbprint": "[parameters('certificateThumbprint')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]"
-            ]
+            ],
+            "copy" : {
+                "name": "hostname-copy",
+                "count": "[length(parameters('customHostName'))]"
+            }
         }
     ],
     "outputs": {
