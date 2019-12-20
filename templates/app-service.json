@@ -34,6 +34,15 @@
             "type": "bool",
             "defaultValue": true
         },
+        "appKind": {
+            "type": "string",
+            "defaultValue": "app",
+            "allowedValues": [
+                "web",
+                "app",
+                "api"
+            ]
+        },
         "sslBindingType": {
             "type": "string",
             "defaultValue": "SniEnabled",
@@ -45,14 +54,18 @@
     },
     "variables": {
         "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
-        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+    "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
     },
     "resources": [
         {
             "name": "[parameters('appServiceName')]",
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
+            "kind": "[parameters('appKind')]",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "serverFarmId": "[variables('appServicePlanId')]",
                 "clientAffinityEnabled": false,
@@ -68,14 +81,15 @@
                     "condition": "[parameters('deployStagingSlot')]",
                     "name": "staging",
                     "type": "slots",
-                    "apiVersion": "2016-08-01",
+                    "apiVersion": "2018-11-01",
                     "location": "[resourceGroup().location]",
                     "properties": {
                         "clientAffinityEnabled": false,
                         "siteConfig": {
                             "appSettings": "[parameters('appServiceAppSettings')]",
                             "connectionStrings": "[parameters('appServiceConnectionStrings')]"
-                        }
+                        },
+                        "httpsOnly": true
                     },
                     "dependsOn": [
                         "[parameters('appServiceName')]"
@@ -88,7 +102,7 @@
             "type": "Microsoft.Web/sites/hostnameBindings",
             "condition": "[variables('UseCustomHostname')]",
             "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "sslState": "[parameters('sslBindingType')]",
@@ -103,6 +117,15 @@
         "possibleOutboundIpAddresses": {
             "type": "array",
             "value": "[split(reference(parameters('appServiceName')).possibleOutboundIpAddresses, ',')]"
+        },
+        "managedServiceIdentityId": {
+            "type": "string",
+            "value": "[reference(parameters('appServiceName'), '2018-11-01', 'Full').identity.principalId]"
+        },
+        "stagingManagedServiceIdentityId": {
+            "condition": "[parameters('deployStagingSlot')]",
+            "type": "string",
+            "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
         }
     }
 }

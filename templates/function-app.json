@@ -33,15 +33,19 @@
     },
     "variables": {
         "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
-        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "functionAppApiVersion": "2019-08-01"
     },
     "resources": [
         {
             "name": "[parameters('functionAppName')]",
             "type": "Microsoft.Web/sites",
             "kind": "functionapp",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "serverFarmId": "[variables('appServicePlanId')]",
                 "clientAffinityEnabled": false,
@@ -57,7 +61,7 @@
             "type": "Microsoft.Web/sites/hostnameBindings",
             "condition": "[variables('UseCustomHostname')]",
             "name": "[concat(parameters('functionAppName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "sslState": "SniEnabled",
@@ -69,9 +73,13 @@
         }
     ],
     "outputs": {
-        "possibleOutboundIpAddresses": {
+        "PossibleOutboundIpAddresses": {
             "type": "array",
             "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
+        },
+        "ManagedServiceIdentityId": {
+            "type": "string",
+            "value": "[reference(parameters('functionAppName'), variables('functionAppApiVersion'), 'Full').identity.principalId]"
         }
     }
 }
