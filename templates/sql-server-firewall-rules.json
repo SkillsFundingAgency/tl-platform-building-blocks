@@ -2,17 +2,10 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "firewallRuleNamePrefix": {
-            "type": "string",
-            "metadata": {
-                "description": "The prefix for the firewall rule name, it will be appended by the IP address"
-            }
-        },
-        "ipAddresses": {
+        "sqlServerFirewallRules": {
             "type": "array",
-            "minLength": 1,
             "metadata": {
-                "description": "Array of IP addresses to whitelist against a SQL server"
+                "description": "Ip addresses to be whitelisted on the sql server"
             }
         },
         "serverName": {
@@ -25,15 +18,15 @@
     "variables": {},
     "resources": [
         {
-            "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), parameters('ipAddresses')[copyIndex()])]",
+            "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), parameters('sqlServerFirewallRules')[copyIndex()].Name)]",
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
             "properties": {
-                "startIpAddress": "[parameters('ipAddresses')[copyIndex()]]",
-                "endIpAddress": "[parameters('ipAddresses')[copyIndex()]]"
+                "startIpAddress": "[parameters('sqlServerFirewallRules')[copyIndex()].StartIPAddress]",
+                "endIpAddress": "[parameters('sqlServerFirewallRules')[copyIndex()].EndIPAddress]"
             },
             "copy": {
-                "count": "[length(parameters('ipAddresses'))]",
+                "count": "[length(parameters('sqlServerFirewallRules'))]",
                 "mode": "Parallel",
                 "name": "firewallRuleCopy"
             }
