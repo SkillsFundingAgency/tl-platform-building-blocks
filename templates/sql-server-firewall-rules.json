@@ -4,14 +4,15 @@
     "parameters": {
         "sqlServerFirewallRules": {
             "type": "array",
+            "minLength": 1,            
             "metadata": {
-                "description": "Ip addresses to be whitelisted on the sql server"
+                "description": "Array of IP addresses to whitelist against a SQL server"
             }
         },
         "serverName": {
             "type": "string",
             "metadata": {
-                "description": "Name of the server to add firewall rules to"
+                "description": "Name of the SQL server to add firewall rules to"
             }
         }
     },
