@@ -19,7 +19,7 @@
     "variables": {},
     "resources": [
         {
-            "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), parameters('sqlServerFirewallRules')[copyIndex()].Name)]",
+            "name": "[concat(parameters('serverName'), '/', parameters('sqlServerFirewallRules')[copyIndex()].Name)]",
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
             "properties": {
