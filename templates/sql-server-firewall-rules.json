@@ -2,9 +2,15 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sqlServerFirewallRules": {
+        "firewallRuleNamePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the firewall rule name, it will be appended by the IP address"
+            }
+        },
+        "ipAddresses": {
             "type": "array",
-            "minLength": 1,            
+            "minLength": 1,
             "metadata": {
                 "description": "Array of IP addresses to whitelist against a SQL server"
             }
@@ -12,26 +18,26 @@
         "serverName": {
             "type": "string",
             "metadata": {
-                "description": "Name of the SQL server to add firewall rules to"
+                "description": "Name of the server to add firewall rules to"
             }
         }
     },
     "variables": {},
     "resources": [
         {
-            "name": "[concat(parameters('serverName'), '/', parameters('sqlServerFirewallRules')[copyIndex()].Name)]",
+            "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), parameters('ipAddresses')[copyIndex()])]",
             "type": "Microsoft.Sql/servers/firewallRules",
             "apiVersion": "2015-05-01-preview",
             "properties": {
-                "startIpAddress": "[parameters('sqlServerFirewallRules')[copyIndex()].StartIPAddress]",
-                "endIpAddress": "[parameters('sqlServerFirewallRules')[copyIndex()].EndIPAddress]"
+                "startIpAddress": "[parameters('ipAddresses')[copyIndex()]]",
+                "endIpAddress": "[parameters('ipAddresses')[copyIndex()]]"
             },
             "copy": {
-                "count": "[length(parameters('sqlServerFirewallRules'))]",
+                "count": "[length(parameters('ipAddresses'))]",
                 "mode": "Parallel",
                 "name": "firewallRuleCopy"
             }
         }
     ],
     "outputs": {}
-}
+} 
