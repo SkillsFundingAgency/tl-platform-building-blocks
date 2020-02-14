@@ -43,12 +43,12 @@
             ]
         },
         "ipSecurityRestrictions": {
-          "type": "array",
-          "defaultValue": [],
-          "metadata": {
-            "description": "Format removing backlashes: [{\"Name\": \"IP A\",\"ipAddress\": \"123.123.123.123\"},{\"Name\": \"IP B\",\"ipAddress\": \"234.234.234.234\"}]"
-          }
-        },
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "Format removing backlashes: [{\"Name\": \"IP A\",\"ipAddress\": \"123.123.123.123\"},{\"Name\": \"IP B\",\"ipAddress\": \"234.234.234.234\"}]"
+            }
+        }
     },
     "variables": {
         "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
@@ -58,8 +58,11 @@
         {
             "name": "[parameters('appServiceName')]",
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "serverFarmId": "[variables('appServicePlanId')]",
                 "clientAffinityEnabled": false,
@@ -76,8 +79,11 @@
                     "condition": "[parameters('deployStagingSlot')]",
                     "name": "staging",
                     "type": "slots",
-                    "apiVersion": "2016-08-01",
+                    "apiVersion": "2018-11-01",
                     "location": "[resourceGroup().location]",
+                    "identity": {
+                        "type": "SystemAssigned"
+                    },
                     "properties": {
                         "clientAffinityEnabled": false,
                         "siteConfig": {
@@ -97,7 +103,7 @@
             "type": "Microsoft.Web/sites/hostnameBindings",
             "condition": "[variables('UseCustomHostname')]",
             "name": "[concat(parameters('appServiceName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
             "properties": {
                 "sslState": "[parameters('sslBindingType')]",
@@ -109,9 +115,18 @@
         }
     ],
     "outputs": {
-        "possibleOutboundIpAddresses": {
+        "PossibleOutboundIpAddresses": {
             "type": "array",
             "value": "[split(reference(parameters('appServiceName')).possibleOutboundIpAddresses, ',')]"
+        },
+        "ManagedServiceIdentityId": {
+            "type": "string",
+            "value": "[reference(parameters('appServiceName'), '2018-11-01', 'Full').identity.principalId]"
+        },
+        "StagingManagedServiceIdentityId": {
+            "condition": "[parameters('deployStagingSlot')]",
+            "type": "string",
+            "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
         }
     }
 }
