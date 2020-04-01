@@ -30,16 +30,6 @@
                 "roleDefinitionId": "[variables(parameters('assignmentType'))]",
                 "principalId": "[parameters('principalId')]"
             }
-        },
-        {
-            "condition": "[equals(parameters('assignmentType'), 'UserAccessAdministrator')]",
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[concat(resourceGroup().name, '/Microsoft.Authorization/', guid(uniqueString(parameters('principalId'))))]",
-            "properties": {
-                "roleDefinitionId": "[variables(parameters('assignmentType'))]",
-                "principalId": "[parameters('principalId')]"
-            }
         }
     ]
 }
