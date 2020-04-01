@@ -8,7 +8,7 @@
         "assignmentType": {
             "type": "string",
             "allowedValues": [
-                "StorageAccountContributor"
+                "Contributor"
             ]
         },
         "resourceName": {
