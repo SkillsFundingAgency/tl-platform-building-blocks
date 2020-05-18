@@ -47,7 +47,9 @@
     },
     "variables": {
         "auditPolicyName": "[concat(parameters('sqlServerName'), '-DefaultAuditPolicy')]",
-        "securityAlertPolicyName": "[concat(parameters('sqlServerName'), '-DefaultSecurityAlert')]"
+        "securityAlertPolicyName": "[concat(parameters('sqlServerName'), '-DefaultSecurityAlert')]",
+        "vulnerabilityAssessmentsName": "[concat(parameters('sqlServerName'), '-DefaultVulnerabilityAssessments')]"
+
     },
     "resources": [
         {
@@ -93,6 +95,23 @@
                     }
                 },
                 {
+                    "type": "vulnerabilityAssessments",
+                    "apiVersion": "2018-06-01-preview",
+                    "name": "[variables('vulnerabilityAssessmentsName')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]",
+                        "[resourceId('Microsoft.Storage/StorageAccounts', parameters('sqlStorageAccountName'))]"
+                    ],
+                    "properties": {
+                        "storageContainerPath": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/vulnerability-assessment/')]",
+                        "recurringScans": {
+                            "isEnabled": false,
+                            "emailSubscriptionAdmins": false,
+                            "emails": []
+                        }
+                    }
+                },
+                {
                     "type": "administrators",
                     "name": "activeDirectory",
                     "apiVersion": "2014-04-01-preview",
@@ -110,5 +129,6 @@
             ]
         }
     ],
-    "outputs": {}
+    "outputs": {
+    }
 }
