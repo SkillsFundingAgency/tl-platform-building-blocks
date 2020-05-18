@@ -99,8 +99,8 @@
                     "apiVersion": "2018-06-01-preview",
                     "name": "[variables('vulnerabilityAssessmentsName')]",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]",
-                        "[resourceId('Microsoft.Storage/StorageAccounts', parameters('sqlStorageAccountName'))]"
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/auditingSettings/', variables('AuditPolicyName'))]"
                     ],
                     "properties": {
                         "storageContainerPath": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/vulnerability-assessment/')]",
