@@ -105,7 +105,7 @@
                     "properties": {
                         "storageContainerPath": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/vulnerability-assessment/')]",
                         "recurringScans": {
-                            "isEnabled": false,
+                            "isEnabled": true,
                             "emailSubscriptionAdmins": false,
                             "emails": []
                         }
