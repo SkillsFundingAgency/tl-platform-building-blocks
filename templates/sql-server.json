@@ -88,10 +88,8 @@
                         "state": "Enabled",
                         "disabledAlerts": "",
                         "emailAddresses": "[parameters('threatDetectionEmailAddress')]",
-                        "emailAccountAdmins": "Disabled",
-                        "retentionDays": "90",
-                        "storageEndpoint": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/')]",
-                        "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+                        "emailAccountAdmins": "false"
+                        
                     }
                 },
                 {
