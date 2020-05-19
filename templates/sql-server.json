@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sqlServerName": {
@@ -55,7 +55,7 @@
         {
             "name": "[parameters('sqlServerName')]",
             "type": "Microsoft.Sql/servers",
-            "apiVersion": "2019-06-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "location": "[resourceGroup().location]",
             "properties": {
                 "administratorLogin": "[parameters('sqlServerAdminUserName')]",
@@ -63,7 +63,7 @@
             },
             "resources": [
                 {
-                    "apiVersion": "2019-06-01-preview",
+                    "apiVersion": "2015-05-01-preview",
                     "type": "auditingSettings",
                     "name": "[variables('AuditPolicyName')]",
                     "dependsOn": [
@@ -77,7 +77,7 @@
                     }
                 },
                 {
-                    "apiVersion": "2019-06-01-preview",
+                    "apiVersion": "2015-05-01-preview",
                     "type": "securityAlertPolicies",
                     "name": "[variables('SecurityAlertPolicyName')]",
                     "dependsOn": [
@@ -96,7 +96,7 @@
                 },
                 {
                     "type": "vulnerabilityAssessments",
-                    "apiVersion": "2019-06-01-preview",
+                    "apiVersion": "2018-06-01-preview",
                     "name": "[variables('vulnerabilityAssessmentsName')]",
                     "dependsOn": [
                         "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
@@ -114,7 +114,7 @@
                 {
                     "type": "administrators",
                     "name": "activeDirectory",
-                    "apiVersion": "2019-06-01-preview",
+                    "apiVersion": "2014-04-01-preview",
                     "location": "[resourceGroup().location]",
                     "properties": {
                         "administratorType": "ActiveDirectory",
