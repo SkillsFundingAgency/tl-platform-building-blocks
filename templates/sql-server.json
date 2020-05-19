@@ -88,8 +88,7 @@
                         "state": "Enabled",
                         "disabledAlerts": "",
                         "emailAddresses": "[parameters('threatDetectionEmailAddress')]",
-                        "emailAccountAdmins": "false"
-                        
+                        "emailAccountAdmins": "Disabled"                        
                     }
                 },
                 {
