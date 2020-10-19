@@ -100,7 +100,8 @@
                     "name": "[variables('vulnerabilityAssessmentsName')]",
                     "dependsOn": [
                         "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
-                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/auditingSettings/', variables('AuditPolicyName'))]"
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/auditingSettings/', variables('AuditPolicyName'))]",
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/securityAlertPolicies/', variables('securityAlertPolicyName'))]"
                     ],
                     "properties": {
                         "storageContainerPath": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/vulnerability-assessment/')]",
