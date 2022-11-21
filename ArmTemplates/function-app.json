@@ -49,6 +49,19 @@
                 "None",
                 "SystemAssigned"
             ]
+        },
+        "http20Enabled": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "FtpsOnly",
+            "allowedValues": [
+                "AllAllowed",
+                "FtpsOnly",
+                "Disabled"
+            ]
         }
     },
     "variables": {
@@ -71,7 +84,9 @@
                 "siteConfig": {
                     "alwaysOn": true,
                     "appSettings": "[parameters('functionAppAppSettings')]",
-                    "connectionStrings": "[parameters('functionAppConnectionStrings')]"
+                    "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                    "http20Enabled": "[parameters('http20Enabled')]",
+                    "ftpsState": "[parameters('ftpsState')]"       
                 },
                 "httpsOnly": true
             },
@@ -89,7 +104,9 @@
                         "clientAffinityEnabled": false,
                         "siteConfig": {
                             "appSettings": "[parameters('functionAppAppSettings')]",
-                            "connectionStrings": "[parameters('functionAppConnectionStrings')]"                          
+                            "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                            "http20Enabled": "[parameters('http20Enabled')]",
+                            "ftpsState": "[parameters('ftpsState')]"                                                
                         }
                     },
                     "dependsOn": [
