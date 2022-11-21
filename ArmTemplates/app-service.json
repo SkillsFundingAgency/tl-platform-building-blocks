@@ -48,12 +48,24 @@
             "metadata": {
                 "description": "Format removing backlashes: [{\"Name\": \"IP A\",\"ipAddress\": \"123.123.123.123\"},{\"Name\": \"IP B\",\"ipAddress\": \"234.234.234.234\"}]"
             }
+        },
+        "http20Enabled": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "FtpsOnly",
+            "allowedValues": [
+                "AllAllowed",
+                "FtpsOnly",
+                "Disabled"
+            ]
         }
     },
     "variables": {
         "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
-        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
-
+        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
     },
     "resources": [
         {
@@ -71,7 +83,9 @@
                     "alwaysOn": true,
                     "appSettings": "[parameters('appServiceAppSettings')]",
                     "connectionStrings": "[parameters('appServiceConnectionStrings')]",
-                    "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]"
+                    "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]",
+                    "http20Enabled": "[parameters('http20Enabled')]",
+                    "ftpsState": "[parameters('ftpsState')]"        
                 },
                 "httpsOnly": true
             },
@@ -90,7 +104,9 @@
                         "siteConfig": {
                             "appSettings": "[parameters('appServiceAppSettings')]",
                             "connectionStrings": "[parameters('appServiceConnectionStrings')]",
-                            "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]"                           
+                            "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]",
+                            "http20Enabled": "[parameters('http20Enabled')]",
+                            "ftpsState": "[parameters('ftpsState')]"                      
                         }
                     },
                     "dependsOn": [
