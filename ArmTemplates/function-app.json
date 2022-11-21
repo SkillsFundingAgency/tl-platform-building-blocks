@@ -30,12 +30,37 @@
                 "description": "This can be passed into the template via the reference function: [reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('certificateName')), '2016-03-01').Thumbprint]"
             }
         },
+        "deployStagingSlot": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "sslBindingType": {
+            "type": "string",
+            "defaultValue": "SniEnabled",
+            "allowedValues": [
+                "SniEnabled",
+                "IpBasedEnabled"
+            ]
+        },
         "systemAssignedIdentity": {
             "type": "string",
             "defaultValue": "None",
             "allowedValues": [
                 "None",
                 "SystemAssigned"
+            ]
+        },
+        "http20Enabled": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "ftpsState": {
+            "type": "string",
+            "defaultValue": "FtpsOnly",
+            "allowedValues": [
+                "AllAllowed",
+                "FtpsOnly",
+                "Disabled"
             ]
         }
     },
@@ -59,10 +84,37 @@
                 "siteConfig": {
                     "alwaysOn": true,
                     "appSettings": "[parameters('functionAppAppSettings')]",
-                    "connectionStrings": "[parameters('functionAppConnectionStrings')]"
+                    "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                    "http20Enabled": "[parameters('http20Enabled')]",
+                    "ftpsState": "[parameters('ftpsState')]"       
                 },
                 "httpsOnly": true
-            }
+            },
+            "resources": [
+                {
+                    "condition": "[parameters('deployStagingSlot')]",
+                    "name": "staging",
+                    "type": "slots",
+                    "apiVersion": "2018-11-01",
+                    "location": "[resourceGroup().location]",
+                    "identity": {
+                        "type": "[parameters('systemAssignedIdentity')]"
+                    },
+                    "properties": {
+                        "clientAffinityEnabled": false,
+                        "siteConfig": {
+                            "appSettings": "[parameters('functionAppAppSettings')]",
+                            "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                            "http20Enabled": "[parameters('http20Enabled')]",
+                            "ftpsState": "[parameters('ftpsState')]"                                                
+                        }
+                    },
+                    "dependsOn": [
+                        "[parameters('functionAppName')]"
+                    ]
+                }
+            ],
+            "dependsOn": []
         },
         {
             "type": "Microsoft.Web/sites/hostnameBindings",
@@ -71,7 +123,7 @@
             "apiVersion": "2020-10-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "sslState": "SniEnabled",
+                "sslState": "[parameters('sslBindingType')]",
                 "thumbprint": "[parameters('certificateThumbprint')]"
             },
             "dependsOn": [
@@ -83,6 +135,15 @@
         "possibleOutboundIpAddresses": {
             "type": "array",
             "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
+        },
+        "ManagedServiceIdentityId": {
+            "type": "string",
+            "value": "[reference(parameters('functionAppName'), '2018-11-01', 'Full').identity.principalId]"
+        },
+        "StagingManagedServiceIdentityId": {
+            "condition": "[parameters('deployStagingSlot')]",
+            "type": "string",
+            "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
         }
     }
 }
