@@ -137,11 +137,12 @@
             "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
         },
         "ManagedServiceIdentityId": {
+            "condition": "[equals(parameters('systemAssignedIdentity'), 'SystemAssigned')]",
             "type": "string",
             "value": "[reference(parameters('functionAppName'), '2018-11-01', 'Full').identity.principalId]"
         },
         "StagingManagedServiceIdentityId": {
-            "condition": "[parameters('deployStagingSlot')]",
+            "condition": "[and(parameters('deployStagingSlot'),equals(parameters('systemAssignedIdentity'), 'SystemAssigned'))]",
             "type": "string",
             "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
         }
