@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "principalId": {
+            "type": "string"
+        },
+        "assignmentType": {
+            "type": "string",
+            "allowedValues": [                
+                "StorageAccountContributor"
+            ]
+        },
+        "resourceName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "StorageAccountContributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '17d1049b-9a84-46fb-8f53-869881c3d3ab')]"
+    },
+    "resources": [
+        {
+            "condition": "[startsWith(parameters('assignmentType'), 'StorageAccount')]",
+            "type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[concat(parameters('resourceName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('principalId'))))]",
+            "properties": {
+                "roleDefinitionId": "[variables(parameters('assignmentType'))]",
+                "principalId": "[parameters('principalId')]"
+            }
+        }
+    ]
+}

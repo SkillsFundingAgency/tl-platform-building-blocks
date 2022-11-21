@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "principalId": {
+            "type": "string"
+        },
+        "assignmentType": {
+            "type": "string",
+            "allowedValues": [
+                "UserAccessAdministrator"                
+            ]
+        }
+    },
+    "variables": {
+        "UserAccessAdministrator": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]"        
+    },
+    "resources": [
+        {
+            "condition": "[equals(parameters('assignmentType'), 'UserAccessAdministrator')]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[parameters('principalId')]",
+            "properties": {
+                "roleDefinitionId": "[variables(parameters('assignmentType'))]",
+                "principalId": "[parameters('principalId')]"
+            }
+        }
+    ]
+}

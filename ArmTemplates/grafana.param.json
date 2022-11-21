@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deploymentUrlBase": {
+            "value": "https://github.com/DFE-Digital/operations-devops-deployment/blob/master/ArmTemplates/"
+        },
+        "projectIdentifier": {
+            "value": "s126d01"
+        },        
+        "mySqlAdminLogin": {
+            "value": "Admin"
+        },
+        "mySqlAdminPassword": {
+            "value": "P@ssword1234"
+        },
+        "grafanaSecurityAdminUser": {
+            "value": "AdminUser"
+        },
+        "grafanaSecurityAdminPassword": {
+            "value": "P@ssword1234"
+        },
+        "grafanaGitHubClientId": {
+            "value": "f1d6b50b0a8dceaa8ab8"
+        },
+        "grafanaGitHubClientSecret": {
+            "value": "52f41564ff62cb4a2947bb240a042fe09fe71edb"
+        },
+        "grafanaGitHubTeamIds": {
+            "value": "2584127,3369724"
+        },
+        "grafanaGitHubAllowedOrgs": {
+            "value": "DFE-Digital,SkillsFundingAgency"
+        }
+    }
+}

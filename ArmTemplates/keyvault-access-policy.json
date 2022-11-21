@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "type": "string"
+        },
+        "keyVaultAccessPolicies": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "Array of objects with the following schema: https://docs.microsoft.com/en-us/azure/templates/microsoft.keyvault/2018-02-14/vaults/accesspolicies"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults/accessPolicies",
+            "name": "[concat(parameters('keyVaultName'), '/add')]",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[parameters('keyVaultAccessPolicies')]"
+            }
+        }
+
+        // {
+        //     "type": "Microsoft.KeyVault/vaults",
+        //     "name": "[parameters('keyVaultName')]",
+        //     "apiVersion": "2019-09-01",
+        //     "location": "[variables('keyVaultLocation')]",
+        //     "properties": {
+        //         "accessPolicies": "[parameters('keyVaultAccessPolicies')]"
+        //     }
+        // }
+    ],
+    "outputs": {}
+}
