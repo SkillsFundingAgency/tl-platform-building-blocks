@@ -108,15 +108,6 @@
         "*"
       ]
     },
-    "minimumTlsVersion": {
-      "type": "string",
-      "defaultValue": "TLS1_0",
-      "allowedValues": [
-        "TLS1_0",
-        "TLS1_0",
-        "TLS1_2"
-      ]
-    },
     "allowAzureServices": {
       "type": "bool",
       "defaultValue": false,
@@ -185,7 +176,6 @@
         "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]",
         "allowSharedKeyAccess": "[parameters('allowSharedKeyAccess')]",
         "supportsHttpsTrafficOnly": true,
-        "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
         "networkAcls": "[if(or(greater(length(parameters('subnetResourceIdList')), 0),greater(length(parameters('allowedIpAddressesList')), 0)), variables('networkAclObject'), json('null'))]"
       },
       "resources": [
