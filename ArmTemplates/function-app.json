@@ -44,7 +44,7 @@
         },
         "systemAssignedIdentity": {
             "type": "string",
-            "defaultValue": "None",
+            "defaultValue": "SystemAssigned",
             "allowedValues": [
                 "None",
                 "SystemAssigned"
@@ -56,11 +56,11 @@
         },
         "http20Enabled": {
             "type": "bool",
-            "defaultValue": false
+            "defaultValue": true
         },
         "ftpsState": {
             "type": "string",
-            "defaultValue": "FtpsOnly",
+            "defaultValue": "Disabled",
             "allowedValues": [
                 "AllAllowed",
                 "FtpsOnly",
