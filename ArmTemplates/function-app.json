@@ -50,6 +50,10 @@
                 "SystemAssigned"
             ]
         },
+        "use32BitWorkerProcess": {
+            "type": "bool",
+            "defaultValue": true
+        },
         "http20Enabled": {
             "type": "bool",
             "defaultValue": false
@@ -85,6 +89,7 @@
                     "alwaysOn": true,
                     "appSettings": "[parameters('functionAppAppSettings')]",
                     "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                    "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
                     "http20Enabled": "[parameters('http20Enabled')]",
                     "ftpsState": "[parameters('ftpsState')]"       
                 },
@@ -105,6 +110,7 @@
                         "siteConfig": {
                             "appSettings": "[parameters('functionAppAppSettings')]",
                             "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+                            "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
                             "http20Enabled": "[parameters('http20Enabled')]",
                             "ftpsState": "[parameters('ftpsState')]"                                                
                         }
