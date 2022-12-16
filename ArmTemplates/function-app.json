@@ -127,7 +127,7 @@
                     "connectionStrings": "[parameters('functionAppConnectionStrings')]",
                     "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
                     "http20Enabled": "[parameters('http20Enabled')]",
-                    "ftpsState": "[parameters('ftpsState')]"       
+                    "ftpsState": "[parameters('ftpsState')]"
                 },
                 "httpsOnly": true
             },
@@ -148,7 +148,7 @@
                             "connectionStrings": "[parameters('functionAppConnectionStrings')]",
                             "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
                             "http20Enabled": "[parameters('http20Enabled')]",
-                            "ftpsState": "[parameters('ftpsState')]"                                                
+                            "ftpsState": "[parameters('ftpsState')]"
                         }
                     },
                     "dependsOn": [
@@ -171,7 +171,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
             ]
-        }//,
+        } //,
         // {
         //     "type": "Microsoft.Web/sites/providers/diagnosticSettings",
         //     "condition": "[greater(length(parameters('workspaceId')), 0)]",
