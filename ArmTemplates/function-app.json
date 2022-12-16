@@ -1,225 +1,226 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "functionAppName": {
-            "type": "string"
-        },
-        "appServicePlanName": {
-            "type": "string"
-        },
-        "appServicePlanResourceGroup": {
-            "type": "string"
-        },
-        "functionAppAppSettings": {
-            "type": "array",
-            "defaultValue": []
-        },
-        "functionAppConnectionStrings": {
-            "type": "array",
-            "defaultValue": []
-        },
-        "customHostName": {
-            "type": "string",
-            "defaultValue": ""
-        },
-        "certificateThumbprint": {
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "This can be passed into the template via the reference function: [reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('certificateName')), '2016-03-01').Thumbprint]"
-            }
-        },
-        "deployStagingSlot": {
-            "type": "bool",
-            "defaultValue": true
-        },
-        "sslBindingType": {
-            "type": "string",
-            "defaultValue": "SniEnabled",
-            "allowedValues": [
-                "SniEnabled",
-                "IpBasedEnabled"
-            ]
-        },
-        "systemAssignedIdentity": {
-            "type": "string",
-            "defaultValue": "SystemAssigned",
-            "allowedValues": [
-                "None",
-                "SystemAssigned"
-            ]
-        },
-        "use32BitWorkerProcess": {
-            "type": "bool",
-            "defaultValue": true
-        },
-        "http20Enabled": {
-            "type": "bool",
-            "defaultValue": true
-        },
-        "ftpsState": {
-            "type": "string",
-            "defaultValue": "Disabled",
-            "allowedValues": [
-                "AllAllowed",
-                "FtpsOnly",
-                "Disabled"
-            ]
-        },
-        "settingName": {
-            "type": "String",
-            "defaultvalue": "AppServiceDiagSettings",
-            "metadata": {
-                "description": "The name of the diagnostic setting"
-            }
-        },
-        "workspaceId": {
-            "type": "String",
-            "defaultValue": "",
-            "metadata": {
-                "description": "ResourceID of the Log Analytics workspace in which resource logs should be saved."
-            }
-        },
-        "appServiceAppLogsSetting": {
-            "type": "bool",
-            "defaultvalue": false,
-            "metadata": {
-                "description": "Function App app logs diagnostic setting"
-            }
-        },
-        "allMetricsSetting": {
-            "type": "bool",
-            "defaultvalue": false,
-            "metadata": {
-                "description": "All Metrics diagnostic setting"
-            }
-        },
-        "retentionPolicyEnabled": {
-            "type": "bool",
-            "defaultValue": false
-        },
-        "retentionPolicyDays": {
-            "type": "string",
-            "defaultValue": "30"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "functionAppName": {
+      "type": "string"
     },
-    "variables": {
-        "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
-        "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+    "appServicePlanName": {
+      "type": "string"
     },
-    "resources": [
-        {
-            "name": "[parameters('functionAppName')]",
-            "type": "Microsoft.Web/sites",
-            "kind": "functionapp",
-            "identity": {
-                "type": "[parameters('systemAssignedIdentity')]"
-            },
-            "apiVersion": "2020-10-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "serverFarmId": "[variables('appServicePlanId')]",
-                "clientAffinityEnabled": false,
-                "siteConfig": {
-                    "alwaysOn": true,
-                    "appSettings": "[parameters('functionAppAppSettings')]",
-                    "connectionStrings": "[parameters('functionAppConnectionStrings')]",
-                    "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
-                    "http20Enabled": "[parameters('http20Enabled')]",
-                    "ftpsState": "[parameters('ftpsState')]"
-                },
-                "httpsOnly": true
-            },
-            "resources": [
-                {
-                    "condition": "[parameters('deployStagingSlot')]",
-                    "name": "staging",
-                    "type": "slots",
-                    "apiVersion": "2018-11-01",
-                    "location": "[resourceGroup().location]",
-                    "identity": {
-                        "type": "[parameters('systemAssignedIdentity')]"
-                    },
-                    "properties": {
-                        "clientAffinityEnabled": false,
-                        "siteConfig": {
-                            "appSettings": "[parameters('functionAppAppSettings')]",
-                            "connectionStrings": "[parameters('functionAppConnectionStrings')]",
-                            "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
-                            "http20Enabled": "[parameters('http20Enabled')]",
-                            "ftpsState": "[parameters('ftpsState')]"
-                        }
-                    },
-                    "dependsOn": [
-                        "[parameters('functionAppName')]"
-                    ]
-                }
-            ],
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Web/sites/hostnameBindings",
-            "condition": "[variables('UseCustomHostname')]",
-            "name": "[concat(parameters('functionAppName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
-            "apiVersion": "2020-10-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "sslState": "[parameters('sslBindingType')]",
-                "thumbprint": "[parameters('certificateThumbprint')]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
-            ]
-        } //,
-        // {
-        //     "type": "Microsoft.Web/sites/providers/diagnosticSettings",
-        //     "condition": "[greater(length(parameters('workspaceId')), 0)]",
-        //     "apiVersion": "2017-05-01-preview",
-        //     "name": "[concat(parameters('functionAppName'),'/microsoft.insights/', parameters('settingName'))]",
-        //     "dependsOn": [
-        //         "[parameters('functionAppName')]"
-        //     ],
-        //     "properties": {
-        //         "name": "[parameters('settingName')]",
-        //         "workspaceId": "[parameters('workspaceId')]",
-        //         "logs": [          
-        //         {
-        //             "category": "AppServiceAppLogs",
-        //             "enabled": "[parameters('appServiceAppLogsSetting')]",
-        //             "retentionPolicy": {
-        //             "enabled": "[parameters('retentionPolicyEnabled')]",
-        //             "days": "[parameters('retentionPolicyDays')]"
-        //             }
-        //         }
-        //         ],
-        //         "metrics": [
-        //         {
-        //             "category": "AllMetrics",
-        //             "enabled": "[parameters('allMetricsSetting')]",
-        //             "retentionPolicy": {
-        //             "enabled": "[parameters('retentionPolicyEnabled')]",
-        //             "days": "[parameters('retentionPolicyDays')]"
-        //             }
-        //         }
-        //         ] 
-        //     }
-        // }
-    ],
-    "outputs": {
-        "possibleOutboundIpAddresses": {
-            "type": "array",
-            "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
-        },
-        "ManagedServiceIdentityId": {
-            "condition": "[equals(parameters('systemAssignedIdentity'), 'SystemAssigned')]",
-            "type": "string",
-            "value": "[reference(parameters('functionAppName'), '2018-11-01', 'Full').identity.principalId]"
-        },
-        "StagingManagedServiceIdentityId": {
-            "condition": "[and(parameters('deployStagingSlot'),equals(parameters('systemAssignedIdentity'), 'SystemAssigned'))]",
-            "type": "string",
-            "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
-        }
+    "appServicePlanResourceGroup": {
+      "type": "string"
+    },
+    "functionAppAppSettings": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "functionAppConnectionStrings": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "customHostName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "certificateThumbprint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "This can be passed into the template via the reference function: [reference(resourceId(parameters('certificateResourceGroup'), 'Microsoft.Web/certificates', parameters('certificateName')), '2016-03-01').Thumbprint]"
+      }
+    },
+    "deployStagingSlot": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "sslBindingType": {
+      "type": "string",
+      "defaultValue": "SniEnabled",
+      "allowedValues": [
+        "SniEnabled",
+        "IpBasedEnabled"
+      ]
+    },
+    "systemAssignedIdentity": {
+      "type": "string",
+      "defaultValue": "SystemAssigned",
+      "allowedValues": [
+        "None",
+        "SystemAssigned"
+      ]
+    },
+    "use32BitWorkerProcess": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "http20Enabled": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "ftpsState": {
+      "type": "string",
+      "defaultValue": "Disabled",
+      "allowedValues": [
+        "AllAllowed",
+        "FtpsOnly",
+        "Disabled"
+      ]
+    },
+    "settingName": {
+      "type": "String",
+      "defaultvalue": "AppServiceDiagSettings",
+      "metadata": {
+        "description": "The name of the diagnostic setting"
+      }
+    },
+    "workspaceId": {
+      "type": "String",
+      "defaultValue": "",
+      "metadata": {
+        "description": "ResourceID of the Log Analytics workspace in which resource logs should be saved."
+      }
+    },
+    "funcServiceAppLogs": {
+      "type": "bool",
+      "defaultvalue": false,
+      "metadata": {
+        "description": "Audit Event diagnostic setting"
+      }
+    },
+    "allMetricsSetting": {
+      "type": "bool",
+      "defaultvalue": false,
+      "metadata": {
+        "description": "All Metrics diagnostic setting"
+      }
+    },
+    "retentionPolicyEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "retentionPolicyDays": {
+      "type": "string",
+      "defaultValue": "30"
     }
+  },
+  "variables": {
+    "useCustomHostname": "[greater(length(parameters('customHostname')), 0)]",
+    "appServicePlanId": "[resourceId(parameters('appServicePlanResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+  },
+  "resources": [
+    {
+      "name": "[parameters('functionAppName')]",
+      "type": "Microsoft.Web/sites",
+      "kind": "functionapp",
+      "identity": {
+        "type": "[parameters('systemAssignedIdentity')]"
+      },
+      "apiVersion": "2020-10-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "serverFarmId": "[variables('appServicePlanId')]",
+        "clientAffinityEnabled": false,
+        "siteConfig": {
+          "alwaysOn": true,
+          "appSettings": "[parameters('functionAppAppSettings')]",
+          "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+          "http20Enabled": "[parameters('http20Enabled')]",
+          "ftpsState": "[parameters('ftpsState')]"
+        },
+        "httpsOnly": true
+      },
+      "resources": [
+        {
+          "condition": "[parameters('deployStagingSlot')]",
+          "name": "staging",
+          "type": "slots",
+          "apiVersion": "2018-11-01",
+          "location": "[resourceGroup().location]",
+          "identity": {
+            "type": "[parameters('systemAssignedIdentity')]"
+          },
+          "properties": {
+            "clientAffinityEnabled": false,
+            "siteConfig": {
+              "appSettings": "[parameters('functionAppAppSettings')]",
+              "connectionStrings": "[parameters('functionAppConnectionStrings')]",
+              "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+              "http20Enabled": "[parameters('http20Enabled')]",
+              "ftpsState": "[parameters('ftpsState')]"
+            }
+          },
+          "dependsOn": [
+            "[parameters('functionAppName')]"
+          ]
+        }
+      ],
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Web/sites/hostnameBindings",
+      "condition": "[variables('UseCustomHostname')]",
+      "name": "[concat(parameters('functionAppName'), '/', if(variables('useCustomHostname'), parameters('customHostname'), 'placeholder'))]",
+      "apiVersion": "2020-10-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sslState": "[parameters('sslBindingType')]",
+        "thumbprint": "[parameters('certificateThumbprint')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+      "condition": "[greater(length(parameters('workspaceId')), 0)]",
+      "apiVersion": "2017-05-01-preview",
+      "name": "[concat(parameters('functionAppName'),'/microsoft.insights/', parameters('settingName'))]",
+      "dependsOn": [
+        "[parameters('functionAppName')]"
+      ],
+      "properties": {
+        "name": "[parameters('settingName')]",
+        "workspaceId": "[parameters('workspaceId')]",
+        "logs": [
+          {
+            "category": "FunctionAppLogs",
+            "enabled": "[parameters('funcServiceAppLogs')]",
+            "retentionPolicy": {
+              "enabled": "[parameters('retentionPolicyEnabled')]",
+              "days": "[parameters('retentionPolicyDays')]"
+            }
+          }
+
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": "[parameters('allMetricsSetting')]",
+            "retentionPolicy": {
+              "enabled": "[parameters('retentionPolicyEnabled')]",
+              "days": "[parameters('retentionPolicyDays')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "possibleOutboundIpAddresses": {
+      "type": "array",
+      "value": "[split(reference(parameters('functionAppName')).possibleOutboundIpAddresses, ',')]"
+    },
+    "ManagedServiceIdentityId": {
+      "condition": "[equals(parameters('systemAssignedIdentity'), 'SystemAssigned')]",
+      "type": "string",
+      "value": "[reference(parameters('functionAppName'), '2018-11-01', 'Full').identity.principalId]"
+    },
+    "StagingManagedServiceIdentityId": {
+      "condition": "[and(parameters('deployStagingSlot'),equals(parameters('systemAssignedIdentity'), 'SystemAssigned'))]",
+      "type": "string",
+      "value": "[reference('staging', '2018-11-01', 'Full').identity.principalId]"
+    }
+  }
 }
