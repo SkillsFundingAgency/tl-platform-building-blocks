@@ -56,7 +56,7 @@
         "virtualNetworkSubnetId": "[parameters('subnetResourceIdList')[copyIndex()]]"
       },
       "copy": {
-        "count": "[length(parameters('subnetResourceIdList'))]",
+        "count": "[if(greater(length(parameters('subnetResourceIdList')), 0), length(parameters('subnetResourceIdList')), 1)]",
         "mode": "Parallel",
         "name": "virtualNetworkRuleCopy"
       }
