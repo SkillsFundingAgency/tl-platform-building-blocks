@@ -9,11 +9,18 @@
         "description": "The prefix for the firewall rule name, it will be appended by the IP address"
       }
     },
-    "ipAddresses": {
-      "type": "array",
-      "defaultValue": [],
+    "startIpAddress": {
+      "type": "string",
+      "defaultValue": "",
       "metadata": {
-        "description": "Array of IP addresses to whitelist against a SQL server"
+        "description": "String of IP addresses to whitelist against a SQL server"
+      }
+    },
+    "endIpAddress": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "String of IP addresses to whitelist against a SQL server"
       }
     },
     "serverName": {
@@ -28,11 +35,30 @@
       "metadata": {
         "description": "A list of subnet resource ids."
       }
+    },
+    "ipAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of IP addresses to whitelist against a SQL server, these are azure IP addresses that are passed in using the reference function"
+      }
     }
   },
   "variables": {},
   "resources": [
     {
+      // This resource is used for pre-defined IP ranges.
+      "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'))]",
+      "condition": "[greater(length(parameters('startIpAddress')), 0)]",
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "startIpAddress": "[parameters('startIpAddress')]",
+        "endIpAddress": "[parameters('endIpAddress')]"
+      }
+    },
+    {
+      // This resource is used for azure resource IP addresses that are passed in using the reference function
       "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), if(greater(length(parameters('ipAddresses')), 0), parameters('ipAddresses')[copyIndex()], 'placeholder'))]",
       "condition": "[greater(length(parameters('ipAddresses')), 0)]",
       "type": "Microsoft.Sql/servers/firewallRules",
