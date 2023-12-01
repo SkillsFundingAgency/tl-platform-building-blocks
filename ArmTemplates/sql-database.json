@@ -3,18 +3,31 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "databaseName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "(Required) Name of the SQL database to deploy."
+            }
         },
+        
         "sqlServerName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "(Required) Name of the SQL server to deploy this database to."
+            }
         },
         "elasticPoolName": {
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Optional) Name of the elastic pool containing this database, used in the resource id to reference the elastic pool."
+            }
         },
         "databaseSkuName": {
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Required) The database SKU names e.g. S0 or GP_S_Gen5_6. Not required if deployToElasticPool is true."
+            }
         },
         "databaseSizeBytes": {
             "type": "string",
@@ -31,28 +44,37 @@
                 "GeneralPurpose",
                 "BusinessCritical",
                 "Hyperscale"
-            ]
+            ],
+            "metadata": {
+                "description": "(Optional) The database SKU, equired if not using elastic pool."
+            }
         },
         "serverlessMinCapacity": {
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Optional) Minimal capacity that database will always have allocated, if not paused To specify a decimal value, use the json() function."
+            }
         },
         "serverlessAutoPauseDelay": {
             "type": "string",
-            "defaultValue": "-1"
+            "defaultValue": "-1",
+            "metadata": {
+                "description": "(Optional) Time in minutes after which database is automatically paused. A value of -1 means that automatic pause is disabled."
+            }
         },
         "dataMaskingExemptPrincipals": {
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description": "Semi-colon separated list of database principals who are exempt from the following data masking rules"
+                "description": "(Optional) Semi-colon separated list of database principals who are exempt from the following data masking rules."
             }
         },
         "dataMaskingRules": {
             "type": "array",
             "defaultValue": [],
             "metadata": {
-                "description": "Object array where object is of type DataMaskingRuleProperties: https://docs.microsoft.com/en-us/azure/templates/microsoft.sql/servers/databases/datamaskingpolicies/rules#DataMaskingRuleProperties"
+                "description": "(Optional) Object array where object is of type DataMaskingRuleProperties: https://docs.microsoft.com/en-us/azure/templates/microsoft.sql/servers/databases/datamaskingpolicies/rules#DataMaskingRuleProperties."
             }
         },
         "diagnosticsRetentionDays": {
@@ -61,29 +83,54 @@
             "minValue": 0,
             "maxValue": 365,
             "metadata": {
-                "descrtiption": "The number of days that diagnostic logs will be stored for. Default value is forever, max is 1 year."
+                "descrtiption": "(Optional) The number of days that diagnostic logs will be stored for. Default value is forever, max is 1 year."
             }
-    },
-    "logAnalyticsSubscriptionId": {
-      "type": "string",
-      "defaultValue": "[subscription().subscriptionId]",
-      "metadata": {
-        "description": "The id of the subscription for the Log Analytics Workspace. This defaults to the current subscription."
-      }
-    },
-    "logAnalyticsResourceGroup": {
-      "type": "string",
-      "defaultValue" : "[resourceGroup().name]",
-      "metadata": {
-        "description": "The resource group of the Log Analytics Workspace."
-      }
-    },
-    "logAnalyticsWorkspaceName": {
-      "type": "string",
-      "defaultValue" : "",
-      "metadata": {
-        "description": "The name of the Log Analytics Workspace."
-      }
+        },
+        "logAnalyticsSubscriptionId": {
+            "type": "string",
+            "defaultValue": "[subscription().subscriptionId]",
+            "metadata": {
+            "description": "(Optional) The id of the subscription for the Log Analytics Workspace used for diagnostics settings. This defaults to the current subscription."
+         }
+        },
+        "logAnalyticsResourceGroup": {
+            "type": "string",
+            "defaultValue" : "[resourceGroup().name]",
+            "metadata": {
+                "description": "(Optional) The resource group of the Log Analytics Workspace used for diagnostics settings."
+            }
+        },
+        "logAnalyticsWorkspaceName": {
+            "type": "string",
+            "defaultValue" : "",
+            "metadata": {
+                "description": "(Optional) The name of the Log Analytics Workspace used for diagnostics settings."
+            }
+        },
+        "createMode":{
+            "type": "string",
+            "defaultValue": "Default",
+            "allowedValues": [
+                "Default",
+                "Secondary"
+            ],
+            "metadata": {
+                "description": "(Optional) Specifies the mode of database creation, modes explained: https://learn.microsoft.com/en-us/azure/templates/microsoft.sql/servers/databases?pivots=deployment-language-arm-template#databaseproperties-1"
+            }
+        },
+        "sourceDatabaseId":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Optional) The resourceId of the source database associated with create operation of this database if createMode is not 'Default'."
+            }
+        },
+        "requestedBackupStorageRedundancy":{
+            "type": "string",
+            "defaultValue": "Geo",
+            "metadata": {
+                "description": "(Optional) The storage account type to be used to store backups for this database."
+            }
         }
     },
     "variables": {
@@ -97,7 +144,10 @@
                 "properties": {
                     "maxSizeBytes": "[parameters('databaseSizeBytes')]",
                     "minCapacity": "[parameters('serverlessMinCapacity')]",
-                    "autoPauseDelay": "[parameters('serverlessAutoPauseDelay')]"
+                    "autoPauseDelay": "[parameters('serverlessAutoPauseDelay')]",
+                    "createMode": "[parameters('createMode')]",
+                    "sourceDatabaseId": "[if(equals(parameters('createMode'),'Secondary'), parameters('sourceDatabaseId'), null())]",
+                    "requestedBackupStorageRedundancy": "[parameters('requestedBackupStorageRedundancy')]"
                 }
             },
             "elasticPool": {
@@ -132,6 +182,7 @@
             "resources": [
                 {
                     "name": "current",
+                    "condition": "[not(equals(parameters('createMode'),'Secondary'))]",
                     "type": "transparentDataEncryption",
                     "apiVersion": "2014-04-01",
                     "properties": {
@@ -201,5 +252,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "sqlDatabaseResourceId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlServerName'), parameters('databaseName'))]"
+        }
+    }
 }
