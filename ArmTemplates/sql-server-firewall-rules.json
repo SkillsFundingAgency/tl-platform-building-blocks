@@ -33,9 +33,9 @@
       "type": "array",
       "defaultValue": [],
       "metadata": {
-          "description": "Array of predefined IP addresses to whitelist against a SQL server, these are azure IP addresses that are passed in using the reference function"
+        "description": "Array of predefined IP addresses to whitelist against a SQL server, these are azure IP addresses that are passed in using the reference function"
       }
-        }
+    }
   },
   "variables": {},
   "resources": [
@@ -50,9 +50,9 @@
         "endIpAddress": "[parameters('sqlFirewallIpAddressesPredefined')[copyIndex()].endIpAddress]"
       },
       "copy": {
-          "count": "[length(parameters('sqlFirewallIpAddressesPredefined'))]",
-          "name": "firewallrulecopy",
-          "mode": "Parallel"
+        "count": "[length(parameters('sqlFirewallIpAddressesPredefined'))]",
+        "name": "firewallrulecopy",
+        "mode": "Parallel"
       }
     },
     {

@@ -31,7 +31,10 @@
         },
         "databaseSizeBytes": {
             "type": "string",
-            "defaultValue": ""
+            "defaultValue": "",
+            "metadata": {
+                "description": "(Optional) The max size of the database expressed in bytes."
+            }
         },
         "databaseTier": {
             "type": "string",
