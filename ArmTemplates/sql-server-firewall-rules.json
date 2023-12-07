@@ -30,12 +30,12 @@
       }
     },
     "sqlFirewallIpAddressesPredefined": {
-            "type": "array",
-            "defaultValue": [],
-            "metadata": {
-               "description": "Array of predefined IP addresses to whitelist against a SQL server, these are azure IP addresses that are passed in using the reference function"
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of predefined IP addresses to whitelist against a SQL server, these are azure IP addresses that are passed in using the reference function"
       }
-        }
+    }
   },
   "variables": {},
   "resources": [
@@ -44,15 +44,15 @@
       "name": "[concat(parameters('serverName'), '/', parameters('sqlFirewallIpAddressesPredefined')[copyIndex()].name)]",
       "condition": "[greater(length(parameters('sqlFirewallIpAddressesPredefined')), 0)]",
       "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2022-05-01-preview",
       "properties": {
         "startIpAddress": "[parameters('sqlFirewallIpAddressesPredefined')[copyIndex()].startIpAddress]",
         "endIpAddress": "[parameters('sqlFirewallIpAddressesPredefined')[copyIndex()].endIpAddress]"
       },
       "copy": {
-          "count": "[length(parameters('sqlFirewallIpAddressesPredefined'))]",
-          "name": "firewallrulecopy",
-          "mode": "Parallel"
+        "count": "[length(parameters('sqlFirewallIpAddressesPredefined'))]",
+        "name": "firewallrulecopy",
+        "mode": "Parallel"
       }
     },
     {
@@ -60,7 +60,7 @@
       "name": "[concat(parameters('serverName'), '/', parameters('firewallRuleNamePrefix'), if(greater(length(parameters('ipAddresses')), 0), parameters('ipAddresses')[copyIndex()], 'placeholder'))]",
       "condition": "[greater(length(parameters('ipAddresses')), 0)]",
       "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2022-05-01-preview",
       "properties": {
         "startIpAddress": "[parameters('ipAddresses')[copyIndex()]]",
         "endIpAddress": "[parameters('ipAddresses')[copyIndex()]]"
@@ -75,7 +75,7 @@
       "name": "[concat(parameters('serverName'), '/', if(greater(length(parameters('subnetResourceIdList')), 0), last(split(parameters('subnetResourceIdList')[copyIndex()], '/')), 'placeholder'))]",
       "condition": "[greater(length(parameters('subnetResourceIdList')), 0)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2022-05-01-preview",
       "properties": {
         "virtualNetworkSubnetId": "[parameters('subnetResourceIdList')[copyIndex()]]"
       },

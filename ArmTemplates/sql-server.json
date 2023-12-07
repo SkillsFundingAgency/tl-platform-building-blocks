@@ -5,7 +5,7 @@
     "sqlServerName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the Azure SQL Server  instance"
+        "description": "(Required) Name of the Azure SQL Server instance"
       }
     },
     "sqlServerLocation": {
@@ -14,63 +14,66 @@
       "allowedValues": [
         "westeurope",
         "northeurope"
-      ]
+      ],
+      "metadata": {
+        "description": "(Required) The region used to deploy resouce."
+      }
     },
     "sqlServerAdminUserName": {
       "type": "string",
       "metadata": {
-        "description": "The Azure SQL Server Administrator (SA) username "
+        "description": "(Required) The Azure SQL Server Administrator (SA) username."
       }
     },
     "sqlServerAdminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "The Azure SQL Server Administrator (SA) password"
+        "description": "(Required) The Azure SQL Server Administrator (SA) password."
       }
     },
     "sqlServerActiveDirectoryAdminLogin": {
       "type": "string",
       "metadata": {
-        "description": "The active directory admin that will be assigned to the SQL server"
+        "description": "(Required) The active directory admin that will be assigned to the SQL server"
       }
     },
     "sqlServerActiveDirectoryAdminObjectId": {
       "type": "string",
       "metadata": {
-        "description": "The object id of the active directory admin that will be assigned to the SQL server"
+        "description": "(Required) The object id of the active directory admin that will be assigned to the SQL server"
       }
     },
     "threatDetectionEmailAddress": {
       "type": "string",
       "metadata": {
-        "description": "The email address that threat alerts will be sent to"
+        "description": "(Required) The email address that threat alerts will be sent to"
       }
     },
     "sqlStorageAccountName": {
       "type": "string",
       "metadata": {
-        "description": "Name of the SQL logs storage account for the environment"
+        "description": "(Required) Name of the SQL logs storage account for the environment"
       }
     },
     "logAnalyticsWorkspaceName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The name of the OMS workspace that will collect audit events"
+        "description": "(Optional) The name of the OMS workspace that will collect audit events"
       }
     },
     "logAnalyticsWorkspaceResourceGroupName": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The name of the OMS workspace resource group that will collect audit events"
+        "description": "(Optional) The name of the OMS workspace resource group that will collect audit events"
       }
     },
     "logAnalyticsWorkspaceSubscriptionId": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The id of the OMS workspace subscription that will collect audit events"
+        "description": "(Optional) The id of the OMS workspace subscription that will collect audit events"
       }
     }
   },
