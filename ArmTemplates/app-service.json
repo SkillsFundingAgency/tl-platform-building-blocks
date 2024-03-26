@@ -103,7 +103,7 @@
     },
     "http20Enabled": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
     "ftpsState": {
       "type": "string",
