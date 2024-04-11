@@ -55,6 +55,12 @@
         "description": "(Required) Name of the SQL logs storage account for the environment"
       }
     },
+    "isStorageSecondaryKeyInUse": {
+      "type": "bool",
+      "metadata": {
+        "description": "Is the secondary storage account key being used"
+      }
+    },
     "logAnalyticsWorkspaceName": {
       "type": "string",
       "defaultValue": "",
@@ -144,8 +150,8 @@
           "properties": {
             "state": "Enabled",
             "storageEndpoint": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
-            "retentionDays": 90,
+            "storageAccountAccessKey": "[if(parameters('isStorageSecondaryKeyInUse'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value)]",
+            "isStorageSecondaryKeyInUse": "[parameters('isStorageSecondaryKeyInUse')]",
             "auditActionsAndGroups": [
               "BATCH_COMPLETED_GROUP",
               "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
