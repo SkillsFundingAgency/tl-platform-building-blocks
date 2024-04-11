@@ -55,6 +55,12 @@
         "description": "(Required) Name of the SQL logs storage account for the environment"
       }
     },
+    "isStorageSecondaryKeyInUse": {
+      "type": "bool",
+      "metadata": {
+        "description": "Is the secondary storage account key being used"
+      }
+    },
     "logAnalyticsWorkspaceName": {
       "type": "string",
       "defaultValue": "",
@@ -74,6 +80,13 @@
       "defaultValue": "",
       "metadata": {
         "description": "(Optional) The id of the OMS workspace subscription that will collect audit events"
+      }
+    },
+    "enableSqlServerVulnerabilityAssessment": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Enables SQL vulnerability assessment scanning"
       }
     }
   },
@@ -137,8 +150,8 @@
           "properties": {
             "state": "Enabled",
             "storageEndpoint": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/')]",
-            "storageAccountAccessKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
-            "retentionDays": 90,
+            "storageAccountAccessKey": "[if(parameters('isStorageSecondaryKeyInUse'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value)]",
+            "isStorageSecondaryKeyInUse": "[parameters('isStorageSecondaryKeyInUse')]",
             "auditActionsAndGroups": [
               "BATCH_COMPLETED_GROUP",
               "SUCCESSFUL_DATABASE_AUTHENTICATION_GROUP",
@@ -178,7 +191,21 @@
           "dependsOn": [
             "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
           ]
+        },
+        {
+          "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
+          "apiVersion": "2023-05-01-preview",
+          "name": "[concat(parameters('sqlServerName'), '/Default')]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/auditingSettings/', variables('AuditPolicyName'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/securityAlertPolicies/', variables('securityAlertPolicyName'))]"
+          ],
+          "properties": {
+            "state": "[parameters('enableSqlServerVulnerabilityAssessment')]"
+          }
         }
+
       ]
     }
   ],
