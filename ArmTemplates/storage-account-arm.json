@@ -216,9 +216,13 @@
     }
   ],
   "outputs": {
-    "storageKey": {
+    "sqlStorageAccountAccessKey1": {
       "type": "string",
       "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+    },
+    "sqlStorageAccountAccessKey2": {
+      "type": "string",
+      "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"
     },
     "storageConnectionStringKey1": {
       "type": "string",
