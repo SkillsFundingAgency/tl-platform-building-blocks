@@ -110,10 +110,8 @@
     },
     "minimumTlsVersion": {
       "type": "string",
-      "defaultValue": "TLS1_0",
+      "defaultValue": "TLS1_2",
       "allowedValues": [
-        "TLS1_0",
-        "TLS1_0",
         "TLS1_2"
       ]
     },

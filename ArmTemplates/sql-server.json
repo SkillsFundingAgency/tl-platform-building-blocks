@@ -93,6 +93,13 @@
       "metadata": {
         "description": "(Optional) The id of the OMS workspace subscription that will collect audit events"
       }
+    },
+    "enableSqlServerVulnerabilityAssessment": {
+      "type": "string",
+      "defaultValue": "Enabled",
+      "metadata": {
+        "description": "Enables SQL vulnerability assessment scanning"
+      }
     }
   },
   "variables": {
@@ -196,7 +203,21 @@
           "dependsOn": [
             "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
           ]
+        },
+        {
+          "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
+          "apiVersion": "2023-05-01-preview",
+          "name": "[concat(parameters('sqlServerName'), '/Default')]",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/auditingSettings/', variables('AuditPolicyName'))]",
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/securityAlertPolicies/', variables('securityAlertPolicyName'))]"
+          ],
+          "properties": {
+            "state": "[parameters('enableSqlServerVulnerabilityAssessment')]"
+          }
         }
+
       ]
     }
   ],
