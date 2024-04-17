@@ -93,9 +93,7 @@
   "variables": {
     "auditPolicyName": "[concat(parameters('sqlServerName'), '-DefaultAuditPolicy')]",
     "securityAlertPolicyName": "[concat(parameters('sqlServerName'), '-DefaultSecurityAlert')]",
-    "diagnosticSettingName": "SQLSecurityAuditEvents_3d229c42-c7e7-4c97-9a99-ec0d0d8b86c1",
-    "storageAccountAccessKey1": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
-    "storageAccountAccessKey2": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value]"
+    "diagnosticSettingName": "SQLSecurityAuditEvents_3d229c42-c7e7-4c97-9a99-ec0d0d8b86c1"
   },
   "resources": [
     {
@@ -152,7 +150,7 @@
           "properties": {
             "state": "Enabled",
             "storageEndpoint": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/')]",
-            "storageAccountAccessKey": "[if(parameters('isStorageSecondaryKeyInUse'),variables('StorageAccountAccessKey2'),variables('StorageAccountAccessKey1'))]",
+            "storageAccountAccessKey": "[if(parameters('isStorageSecondaryKeyInUse'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value)]",
             "isStorageSecondaryKeyInUse": "[parameters('isStorageSecondaryKeyInUse')]",
             "auditActionsAndGroups": [
               "BATCH_COMPLETED_GROUP",
