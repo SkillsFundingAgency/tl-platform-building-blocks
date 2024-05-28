@@ -8,9 +8,27 @@
         "description": "Name of the storage account"
       }
     },
+    "LifecycleRemovalPolicyDaysAfterModification": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of days after modification when the lifecycle removal policy is applied"
+      }
+    },
     "policyRules": {
       "type": "array",
-      "defaultValue": [],
+      "defaultValue": [
+        {
+          "definition": {
+            "actions": {
+              "baseBlob": {
+                "delete": {
+                  "daysAfterModificationGreaterThan": "[parameters('LifecycleRemovalPolicyDaysAfterModification')]"
+                }
+              }
+            }
+          }
+        }
+      ],
       "metadata": {
         "description": "A list of management policy rules. See https://docs.microsoft.com/en-us/azure/templates/microsoft.storage/2019-06-01/storageaccounts/managementpolicies#managementpolicyrule-object for required properties"
       }
