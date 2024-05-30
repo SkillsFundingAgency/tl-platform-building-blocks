@@ -1,5 +1,5 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sqlServerName": {
@@ -89,6 +89,13 @@
       "metadata": {
         "description": "Enables SQL vulnerability assessment scanning"
       }
+    },
+    "isManagedIdentityInUse": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enables managed identity for SQL logs to storage account for the environment"
+      }
     }
   },
   "variables": {
@@ -100,8 +107,11 @@
     {
       "name": "[parameters('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2021-11-01",
       "location": "[parameters('sqlServerLocation')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminUserName')]",
         "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]"
@@ -115,6 +125,33 @@
           "properties": {},
           "dependsOn": [
             "[parameters('sqlServerName')]"
+          ]
+        },
+        {
+          "apiVersion": "2022-09-01",
+          "condition": "[parameters('isManagedIdentityInUse')]",
+          "name": "[concat('sql-server-role-assignment','-', parameters('sqlServerName'))]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "relativePath": "role-assignments/role-assignment-storage-account.json",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+              "principalId": {
+                "value": "[reference(parameters('sqlServerName'), '2021-11-01', 'Full').identity.principalId]"
+              },
+              "assignmentType": {
+                "value": "StorageBlobDataContributor"
+              },
+              "resourceName": {
+                "value": "[parameters('sqlStorageAccountName')]"
+              }
+            }
+          },
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
           ]
         },
         {
@@ -142,17 +179,19 @@
           ]
         },
         {
-          "apiVersion": "2017-03-01-preview",
+          "apiVersion": "2023-05-01-preview",
           "type": "auditingSettings",
           "name": "[variables('AuditPolicyName')]",
           "dependsOn": [
-            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+            "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
+            "[concat('sql-server-role-assignment','-', parameters('sqlServerName'))]"
           ],
           "properties": {
             "state": "Enabled",
             "storageEndpoint": "[concat('https://', parameters('sqlStorageAccountName'), '.blob.core.windows.net/')]",
-            "storageAccountAccessKey": "[if(parameters('isStorageSecondaryKeyInUse'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value)]",
-            "isStorageSecondaryKeyInUse": "[parameters('isStorageSecondaryKeyInUse')]",
+            "storageAccountAccessKey": "[if(not(parameters('isManagedIdentityInUse')), if(parameters('isStorageSecondaryKeyInUse'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[1].value, listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sqlStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value), json('null'))]",
+            "isStorageSecondaryKeyInUse": "[if(not(parameters('isManagedIdentityInUse')), parameters('isStorageSecondaryKeyInUse'), json('null'))]",
+            "isManagedIdentityInUse": "[parameters('isManagedIdentityInUse')]",
             "retentionDays": 90,
             "auditActionsAndGroups": [
               "BATCH_COMPLETED_GROUP",
