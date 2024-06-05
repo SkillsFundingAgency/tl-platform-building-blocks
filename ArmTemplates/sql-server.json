@@ -96,6 +96,13 @@
       "metadata": {
         "description": "Enables managed identity for SQL logs to storage account for the environment"
       }
+    },
+    "user_identity_resource_id": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "The Resource ID of the user-assigned managed identity, in the form of /subscriptions/<subscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<managedIdentity>."
+      }
     }
   },
   "variables": {
@@ -110,11 +117,15 @@
       "apiVersion": "2021-11-01",
       "location": "[parameters('sqlServerLocation')]",
       "identity": {
-        "type": "SystemAssigned"
+        "type": "SystemAssigned,UserAssigned",
+        "userAssignedIdentities": {
+          "[parameters('user_identity_resource_id')]": {}
+        }
       },
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminUserName')]",
-        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]"
+        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+        "primaryUserAssignedIdentityId": "[parameters('user_identity_resource_id')]"
       },
       "resources": [
         {
