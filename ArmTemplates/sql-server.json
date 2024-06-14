@@ -90,11 +90,25 @@
         "description": "Enables SQL vulnerability assessment scanning"
       }
     },
+    "identityType": {
+      "type": "string",
+      "defaultValue": "None",
+      "metadata": {
+        "description": "Type of managed idenity used. Can be SystemAssigned, UserAssigned or SystemAssigned,UserAssigned"
+      }
+    },
     "isManagedIdentityInUse": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
         "description": "Enables managed identity for SQL logs to storage account for the environment"
+      }
+    },
+    "entraReaderUmiResourceId": {
+      "defaultValue": "",
+      "type": "String",
+      "metadata": {
+        "description": "The Resource ID of the user-assigned managed identity, in the form of /subscriptions/<subscriptionId>/resourceGroups/<ResourceGroupName>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<managedIdentity>."
       }
     }
   },
@@ -105,16 +119,28 @@
   },
   "resources": [
     {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "name": "[concat(parameters('sqlServerName'), '-umi')]",
+      "location": "[parameters('sqlServerLocation')]"
+    },
+    {
       "name": "[parameters('sqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "apiVersion": "2021-11-01",
       "location": "[parameters('sqlServerLocation')]",
       "identity": {
-        "type": "SystemAssigned"
+        "type": "[parameters('identityType')]",
+        "userAssignedIdentities": {
+          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('sqlServerName'), '-umi'))]": {},
+          "[parameters('entraReaderUmiResourceId')]": {}
+        }
       },
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminUserName')]",
-        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]"
+        "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+        "primaryUserAssignedIdentityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('sqlServerName'), '-umi'))]"
+
       },
       "resources": [
         {
@@ -140,7 +166,7 @@
             },
             "parameters": {
               "principalId": {
-                "value": "[reference(parameters('sqlServerName'), '2021-11-01', 'Full').identity.principalId]"
+                "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('sqlServerName'), '-umi')), '2023-01-31').principalId]"
               },
               "assignmentType": {
                 "value": "StorageBlobDataContributor"
@@ -179,7 +205,7 @@
           ]
         },
         {
-          "apiVersion": "2023-05-01-preview",
+          "apiVersion": "2021-11-01",
           "type": "auditingSettings",
           "name": "[variables('AuditPolicyName')]",
           "dependsOn": [
@@ -247,8 +273,16 @@
           }
         }
 
+      ],
+      "dependsOn": [
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', concat(parameters('sqlServerName'), '-umi'))]"
       ]
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "sqlUserIdentityResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('sqlServerName'), '-umi'))]"
+    }
+  }
 }
