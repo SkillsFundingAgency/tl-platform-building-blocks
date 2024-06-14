@@ -97,7 +97,7 @@
         "description": "Enables managed identity for SQL logs to storage account for the environment"
       }
     },
-    "user_identity_resource_id": {
+    "userIdentityResourceId": {
       "defaultValue": "",
       "type": "String",
       "metadata": {
@@ -119,13 +119,13 @@
       "identity": {
         "type": "SystemAssigned,UserAssigned",
         "userAssignedIdentities": {
-          "[parameters('user_identity_resource_id')]": {}
+          "[parameters('userIdentityResourceId')]": {}
         }
       },
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminUserName')]",
         "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
-        "primaryUserAssignedIdentityId": "[parameters('user_identity_resource_id')]"
+        "primaryUserAssignedIdentityId": "[parameters('userIdentityResourceId')]"
       },
       "resources": [
         {
