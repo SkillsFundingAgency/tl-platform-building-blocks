@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ipRestrictionRuleNamePrefix": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The prefix for the firewall rule name, it will be appended by the IP address"
+            }
+        },
+        "appServiceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the server to add firewall rules to"
+            }
+        },
+        "ipAddress": {
+            "type": "array",
+            "defaultValue": [],
+            "metadata": {
+                "description": "Array of IP azure addresses to whitelist against an app service, these are azure IP addresses that are passed in using the reference function"
+            }
+        }
+    },
+    "resources": [
+        {
+            // This resource deploys azure app service IP addresses that are passed in using the reference function
+            "name": "[concat(parameters('appServiceName'), '/web')]",
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2022-09-01",
+            "properties": {
+                "ipSecurityRestrictions": [
+                    {
+                        "name": "[concat(parameters('ipRestrictionRuleNamePrefix'), parameters('ipAddress'))]",
+                        "ipAddress": "[parameters('ipAddress')]"
+                    }
+                ]
+            }
+        }
+    ]
+}
