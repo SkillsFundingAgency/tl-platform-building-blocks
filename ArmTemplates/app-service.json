@@ -184,7 +184,7 @@
     },
     "healthCheckPath": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "/health"
     }
   },
   "variables": {
