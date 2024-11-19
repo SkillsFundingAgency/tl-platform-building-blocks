@@ -47,6 +47,7 @@
     },
     "ipSecurityRestrictions": {
       "type": "array",
+      "defaultValue": [],
       "metadata": {
         "description": "Format removing backlashes: [{\"Name\": \"IP A\",\"ipAddress\": \"123.123.123.123\"},{\"Name\": \"IP B\",\"ipAddress\": \"234.234.234.234\"}]"
       }
@@ -54,6 +55,10 @@
     "ipSecurityRestrictionsDefaultAction": {
       "type": "string",
       "defaultValue": "Allow"
+    },
+    "updateApiIpRestrictions": {
+      "type": "bool",
+      "defaultValue": true
     },
     "appServiceSlotAppSettings": {
       "type": "array",
@@ -238,7 +243,7 @@
               "appSettings": "[if(variables('useAppServiceSlotAppSettings'), parameters('appServiceSlotAppSettings'), parameters('appServiceAppSettings'))]",
               "connectionStrings": "[if(variables('useAppServiceSlotConnectionStrings'), parameters('appServiceSlotConnectionStrings'), parameters('appServiceConnectionStrings'))]",
               "virtualApplications": "[parameters('appServiceVirtualApplications')]",
-              "ipSecurityRestrictions": "[parameters('ipSecurityRestrictions')]",
+              "ipSecurityRestrictions": "[if(parameters('updateApiIpRestrictions'), parameters('ipSecurityRestrictions'), reference(resourceId('Microsoft.Web/sites/config', parameters('appServiceName'), 'web')).ipSecurityRestrictions)]",
               "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
               "http20Enabled": "[parameters('http20Enabled')]",
               "ftpsState": "[parameters('ftpsState')]"
