@@ -243,7 +243,7 @@
               "appSettings": "[if(variables('useAppServiceSlotAppSettings'), parameters('appServiceSlotAppSettings'), parameters('appServiceAppSettings'))]",
               "connectionStrings": "[if(variables('useAppServiceSlotConnectionStrings'), parameters('appServiceSlotConnectionStrings'), parameters('appServiceConnectionStrings'))]",
               "virtualApplications": "[parameters('appServiceVirtualApplications')]",
-              "ipSecurityRestrictions": "[if(parameters('updateApiIpRestrictions'), parameters('ipSecurityRestrictions'), reference(resourceId('Microsoft.Web/sites/config', parameters('appServiceName'), 'web')).ipSecurityRestrictions)]",
+              "ipSecurityRestrictions": "[if(parameters('updateApiIpRestrictions'), parameters('ipSecurityRestrictions'), reference(resourceId('Microsoft.Web/sites/config', parameters('appServiceName'), 'web'), '2021-02-01').ipSecurityRestrictions)]",
               "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
               "http20Enabled": "[parameters('http20Enabled')]",
               "ftpsState": "[parameters('ftpsState')]"
