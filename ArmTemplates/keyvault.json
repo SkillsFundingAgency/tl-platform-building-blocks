@@ -22,11 +22,11 @@
     },
     "enableSoftDelete": {
       "type": "bool",
-      "defaultValue": false
+      "defaultValue": true
     },
     "enablePurgeProtection": {
       "type": "bool",
-      "defaultValue": false,
+      "defaultValue": true,
       "metadata": {
         "description": "Enables purge protection.  Warning: This can only be enabled when soft delete is already enabled."
       }
@@ -90,7 +90,7 @@
     {
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('keyVaultName')]",
-      "apiVersion": "2018-02-14",
+      "apiVersion": "2023-07-01",
       "location": "[resourceGroup().location]",
       "properties": "[variables('allProperties')]"
     },
