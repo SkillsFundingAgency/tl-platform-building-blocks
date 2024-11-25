@@ -106,6 +106,13 @@
     "healthCheckPath": {
       "type": "string",
       "defaultValue": ""
+    },
+    "allowBasicAuth": {
+      "type": "bool",
+      "defaultvalue": false,
+      "metadata": {
+        "description": "Used for allowing SCM & FTP basic auth publishing"
+      }
     }
   },
   "variables": {
@@ -209,6 +216,28 @@
             }
           }
         ]
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2024-04-01",
+      "name": "[concat(parameters('functionAppName'), '/ftp')]",
+      "dependsOn": [
+        "[parameters('functionAppName')]"
+      ],
+      "properties": {
+        "allow": "[parameters('allowBasicAuth')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2024-04-01",
+      "name": "[concat(parameters('functionAppName'), '/scm')]",
+      "dependsOn": [
+        "[parameters('functionAppName')]"
+      ],
+      "properties": {
+        "allow": "[parameters('allowBasicAuth')]"
       }
     }
   ],
