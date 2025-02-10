@@ -34,7 +34,7 @@
   "resources": [
     {
       "type": "Microsoft.Sql/servers/elasticpools",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "2024-05-01-preview",
       "name": "[concat(parameters('sqlServerName'), '/', parameters('elasticPoolName'))]",
       "location": "[resourceGroup().location]",
       "properties": {
