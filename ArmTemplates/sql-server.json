@@ -247,7 +247,7 @@
         {
           "type": "administrators",
           "name": "activeDirectory",
-          "apiVersion": "2014-04-01-preview",
+          "apiVersion": "2024-05-01-preview",
           "location": "[parameters('sqlServerLocation')]",
           "properties": {
             "administratorType": "ActiveDirectory",
