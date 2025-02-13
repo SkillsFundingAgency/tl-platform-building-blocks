@@ -154,6 +154,17 @@
       "virtualNetworkRules": "[if(greater(length(parameters('subnetResourceIdList')), 0), variables('virtualNetworkRules').virtualNetworkRules, json('null'))]",
       "ipRules": "[if(greater(length(parameters('allowedIpAddressesList')), 0), variables('ipRules').ipRules, json('null'))]",
       "defaultAction": "Deny"
+    },
+    "corsRules": {
+      "corsRules": [
+        {
+          "allowedOrigins": "[parameters('allowedOrigins')]",
+          "allowedMethods": "[parameters('allowedMethods')]",
+          "maxAgeInSeconds": "[parameters('maxAgeInSeconds')]",
+          "exposedHeaders": "[parameters('exposedHeaders')]",
+          "allowedHeaders": "[parameters('allowedHeaders')]"
+        }
+      ]
     }
   },
   "resources": [
@@ -190,22 +201,19 @@
         {
           "name": "default",
           "type": "blobServices",
-          "condition": "[equals(parameters('enableCors'), 'True')]",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2024-01-01",
           "dependsOn": [
             "[parameters('storageAccountName')]"
           ],
           "properties": {
-            "cors": {
-              "corsRules": [
-                {
-                  "allowedOrigins": "[parameters('allowedOrigins')]",
-                  "allowedMethods": "[parameters('allowedMethods')]",
-                  "maxAgeInSeconds": "[parameters('maxAgeInSeconds')]",
-                  "exposedHeaders": "[parameters('exposedHeaders')]",
-                  "allowedHeaders": "[parameters('allowedHeaders')]"
-                }
-              ]
+            "cors": "[if(equals(parameters('enableCors'), 'True'), variables('corsRules'), json('{}'))]",
+            "deleteRetentionPolicy": {
+              "enabled": true,
+              "days": 90
+            },
+            "containerDeleteRetentionPolicy": {
+              "enabled": true,
+              "days": 90
             }
           },
           "resources": []
