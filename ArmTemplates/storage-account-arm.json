@@ -169,7 +169,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2024-01-01",
       "name": "[parameters('storageAccountName')]",
       "type": "Microsoft.Storage/storageAccounts",
       "location": "[parameters('storageAccountLocation')]",
@@ -195,7 +195,8 @@
         "allowSharedKeyAccess": "[parameters('allowSharedKeyAccess')]",
         "supportsHttpsTrafficOnly": true,
         "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
-        "networkAcls": "[if(or(greater(length(parameters('subnetResourceIdList')), 0),greater(length(parameters('allowedIpAddressesList')), 0)), variables('networkAclObject'), json('null'))]"
+        "networkAcls": "[if(or(greater(length(parameters('subnetResourceIdList')), 0),greater(length(parameters('allowedIpAddressesList')), 0)), variables('networkAclObject'), json('null'))]",
+        "allowCrossTenantReplication": false
       },
       "resources": [
         {
