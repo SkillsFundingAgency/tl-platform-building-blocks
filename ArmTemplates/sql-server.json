@@ -139,6 +139,7 @@
       "properties": {
         "administratorLogin": "[parameters('sqlServerAdminUserName')]",
         "administratorLoginPassword": "[parameters('sqlServerAdminPassword')]",
+        "minimalTlsVersion": "1.2",
         "primaryUserAssignedIdentityId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('sqlServerName'), '-umi'))]"
 
       },
