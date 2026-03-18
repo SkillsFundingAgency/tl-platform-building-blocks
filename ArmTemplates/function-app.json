@@ -160,7 +160,8 @@
               "connectionStrings": "[parameters('functionAppConnectionStrings')]",
               "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
               "http20Enabled": "[parameters('http20Enabled')]",
-              "ftpsState": "[parameters('ftpsState')]"
+              "ftpsState": "[parameters('ftpsState')]",
+              "minTlsVersion": "1.2"
             }
           },
           "dependsOn": [
