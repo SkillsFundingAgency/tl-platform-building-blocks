@@ -162,7 +162,8 @@
               "http20Enabled": "[parameters('http20Enabled')]",
               "ftpsState": "[parameters('ftpsState')]",
               "minTlsVersion": "1.2"
-            }
+            },
+            "httpsOnly": true
           },
           "dependsOn": [
             "[parameters('functionAppName')]"
