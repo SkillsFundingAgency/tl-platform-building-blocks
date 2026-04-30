@@ -17,9 +17,6 @@
     },
     "resourceName": {
       "type": "string"
-    },
-    "scope": {
-      "type": "string"
     }
   },
   "variables": {
@@ -33,11 +30,10 @@
     {
       "type": "Microsoft.KeyVault/vaults/providers/roleAssignments",
       "apiVersion": "2020-04-01-preview",
-      "name": "[concat(parameters('resourceName'), '/Microsoft.Authorization/', guid(uniqueString(parameters('principalId')), parameters('assignmentType'), 'key-vault'))]",
+      "name": "[concat(parameters('resourceName'), '/Microsoft.Authorization/', guid(parameters('resourceName'), parameters('principalId'), parameters('assignmentType')))]",
       "properties": {
         "roleDefinitionId": "[variables(parameters('assignmentType'))]",
-        "principalId": "[parameters('principalId')]",
-        "scope": "[parameters('scope')]"
+        "principalId": "[parameters('principalId')]"
       }
     }
   ]
