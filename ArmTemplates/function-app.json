@@ -172,6 +172,7 @@
           "properties": {
             "clientAffinityEnabled": false,
             "siteConfig": {
+              "alwaysOn": true,
               "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
               "appSettings": "[parameters('functionAppAppSettings')]",
               "connectionStrings": "[parameters('functionAppConnectionStrings')]",
