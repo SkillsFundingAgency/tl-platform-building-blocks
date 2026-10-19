@@ -11,6 +11,13 @@
     "appServicePlanResourceGroup": {
       "type": "string"
     },
+    "netFrameworkVersion": {
+      "type": "string",
+      "defaultValue": "v6.0",
+        "metadata": {
+        "description": "The .NET runtime stack used by the Windows Function App."
+        }
+    },
     "functionAppAppSettings": {
       "type": "array",
       "defaultValue": []
@@ -142,6 +149,7 @@
         "siteConfig": {
           "alwaysOn": true,
           "appSettings": "[parameters('functionAppAppSettings')]",
+          "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
           "connectionStrings": "[parameters('functionAppConnectionStrings')]",
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
           "http20Enabled": "[parameters('http20Enabled')]",
@@ -164,6 +172,7 @@
           "properties": {
             "clientAffinityEnabled": false,
             "siteConfig": {
+              "netFrameworkVersion": "[parameters('netFrameworkVersion')]",
               "appSettings": "[parameters('functionAppAppSettings')]",
               "connectionStrings": "[parameters('functionAppConnectionStrings')]",
               "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
